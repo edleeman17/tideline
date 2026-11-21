@@ -1,0 +1,338 @@
+[
+{
+"name": "Hayling Beachlands",
+"lat": 50.7835,
+"lon": -0.976,
+"kind": "surf"
+},
+{
+"name": "Hayling Sandy Point",
+"lat": 50.788,
+"lon": -0.933,
+"kind": "sup"
+},
+{
+"name": "Langstone Harbour",
+"lat": 50.815,
+"lon": -1.015,
+"kind": "sup"
+},
+{
+"name": "Chichester Hbr Itchenor",
+"lat": 50.807,
+"lon": -0.864,
+"kind": "sup"
+},
+{
+"name": "West Wittering",
+"lat": 50.779,
+"lon": -0.899,
+"kind": "surf"
+},
+{
+"name": "Bracklesham Bay",
+"lat": 50.769,
+"lon": -0.853,
+"kind": "surf"
+},
+{
+"name": "Southsea Castle",
+"lat": 50.778,
+"lon": -1.089,
+"kind": "sup"
+},
+{
+"name": "Eastney",
+"lat": 50.784,
+"lon": -1.045,
+"kind": "sup"
+},
+{
+"name": "Lee-on-the-Solent",
+"lat": 50.8,
+"lon": -1.202,
+"kind": "sup"
+},
+{
+"name": "Stokes Bay",
+"lat": 50.781,
+"lon": -1.16,
+"kind": "sup"
+},
+{
+"name": "Bognor Regis",
+"lat": 50.78,
+"lon": -0.675,
+"kind": "sup"
+},
+{
+"name": "Littlehampton",
+"lat": 50.802,
+"lon": -0.542,
+"kind": "sup"
+},
+{
+"name": "Worthing",
+"lat": 50.81,
+"lon": -0.372,
+"kind": "sup"
+},
+{
+"name": "Shoreham",
+"lat": 50.828,
+"lon": -0.27,
+"kind": "surf"
+},
+{
+"name": "Brighton Pier",
+"lat": 50.817,
+"lon": -0.137,
+"kind": "surf"
+},
+{
+"name": "Camber Sands",
+"lat": 50.933,
+"lon": 0.798,
+"kind": "surf"
+},
+{
+"name": "Compton Bay IoW",
+"lat": 50.65,
+"lon": -1.456,
+"kind": "surf"
+},
+{
+"name": "Freshwater Bay IoW",
+"lat": 50.668,
+"lon": -1.516,
+"kind": "surf"
+},
+{
+"name": "Sandown IoW",
+"lat": 50.654,
+"lon": -1.152,
+"kind": "sup"
+},
+{
+"name": "Ryde IoW",
+"lat": 50.731,
+"lon": -1.154,
+"kind": "sup"
+},
+{
+"name": "Highcliffe",
+"lat": 50.736,
+"lon": -1.705,
+"kind": "surf"
+},
+{
+"name": "Boscombe Pier",
+"lat": 50.719,
+"lon": -1.841,
+"kind": "surf"
+},
+{
+"name": "Sandbanks",
+"lat": 50.688,
+"lon": -1.942,
+"kind": "sup"
+},
+{
+"name": "Studland",
+"lat": 50.656,
+"lon": -1.949,
+"kind": "sup"
+},
+{
+"name": "Kimmeridge",
+"lat": 50.608,
+"lon": -2.127,
+"kind": "surf"
+},
+{
+"name": "Weymouth",
+"lat": 50.615,
+"lon": -2.45,
+"kind": "sup"
+},
+{
+"name": "West Bay",
+"lat": 50.711,
+"lon": -2.764,
+"kind": "surf"
+},
+{
+"name": "Bantham",
+"lat": 50.279,
+"lon": -3.879,
+"kind": "surf"
+},
+{
+"name": "Thurlestone",
+"lat": 50.265,
+"lon": -3.86,
+"kind": "surf"
+},
+{
+"name": "Sennen Cove",
+"lat": 50.077,
+"lon": -5.698,
+"kind": "surf"
+},
+{
+"name": "Porthcurno",
+"lat": 50.042,
+"lon": -5.653,
+"kind": "sup"
+},
+{
+"name": "Praa Sands",
+"lat": 50.104,
+"lon": -5.392,
+"kind": "surf"
+},
+{
+"name": "Gwithian",
+"lat": 50.229,
+"lon": -5.388,
+"kind": "surf"
+},
+{
+"name": "Porthtowan",
+"lat": 50.286,
+"lon": -5.244,
+"kind": "surf"
+},
+{
+"name": "Perranporth",
+"lat": 50.348,
+"lon": -5.156,
+"kind": "surf"
+},
+{
+"name": "Fistral",
+"lat": 50.417,
+"lon": -5.1,
+"kind": "surf"
+},
+{
+"name": "Watergate Bay",
+"lat": 50.443,
+"lon": -5.043,
+"kind": "surf"
+},
+{
+"name": "Polzeath",
+"lat": 50.574,
+"lon": -4.918,
+"kind": "surf"
+},
+{
+"name": "Widemouth Bay",
+"lat": 50.786,
+"lon": -4.558,
+"kind": "surf"
+},
+{
+"name": "Bude Summerleaze",
+"lat": 50.832,
+"lon": -4.554,
+"kind": "surf"
+},
+{
+"name": "Croyde",
+"lat": 51.131,
+"lon": -4.242,
+"kind": "surf"
+},
+{
+"name": "Saunton Sands",
+"lat": 51.113,
+"lon": -4.224,
+"kind": "surf"
+},
+{
+"name": "Woolacombe",
+"lat": 51.172,
+"lon": -4.211,
+"kind": "surf"
+},
+{
+"name": "Freshwater West",
+"lat": 51.654,
+"lon": -5.061,
+"kind": "surf"
+},
+{
+"name": "Newgale",
+"lat": 51.854,
+"lon": -5.122,
+"kind": "surf"
+},
+{
+"name": "Llangennith",
+"lat": 51.6,
+"lon": -4.295,
+"kind": "surf"
+},
+{
+"name": "Rest Bay Porthcawl",
+"lat": 51.489,
+"lon": -3.726,
+"kind": "surf"
+},
+{
+"name": "Abersoch",
+"lat": 52.824,
+"lon": -4.499,
+"kind": "sup"
+},
+{
+"name": "Saltburn",
+"lat": 54.585,
+"lon": -0.969,
+"kind": "surf"
+},
+{
+"name": "Tynemouth Longsands",
+"lat": 55.023,
+"lon": -1.429,
+"kind": "surf"
+},
+{
+"name": "Scarborough South Bay",
+"lat": 54.278,
+"lon": -0.397,
+"kind": "surf"
+},
+{
+"name": "Cayton Bay",
+"lat": 54.24,
+"lon": -0.364,
+"kind": "surf"
+},
+{
+"name": "Cromer",
+"lat": 52.933,
+"lon": 1.302,
+"kind": "surf"
+},
+{
+"name": "Thurso East",
+"lat": 58.596,
+"lon": -3.515,
+"kind": "surf"
+},
+{
+"name": "Pease Bay",
+"lat": 55.932,
+"lon": -2.344,
+"kind": "surf"
+},
+{
+"name": "Portrush",
+"lat": 55.205,
+"lon": -6.641,
+"kind": "surf"
+}
+]

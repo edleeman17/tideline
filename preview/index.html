@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tideline preview</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+ body{margin:0;background:#111;color:#ddd;font:14px ui-monospace,Menlo,monospace;display:flex;flex-wrap:wrap;gap:16px;padding:16px}
+ #side{flex:1;min-width:320px;display:flex;flex-direction:column;gap:10px}
+ #map{height:360px;border:1px solid #333}
+ canvas{background:#000;border-radius:50%;box-shadow:0 0 0 10px #2a2a2a,0 0 0 12px #555}
+ .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+ button,select,input{background:#222;color:#ddd;border:1px solid #444;padding:6px 10px;font:inherit}
+ button.on{background:#3a6;color:#000}
+ #glance{background:#000;border:1px solid #333;padding:8px;width:440px}
+ pre{background:#000;border:1px solid #333;padding:8px;max-height:260px;overflow:auto;font-size:12px;margin:0}
+ #spots{max-height:180px;overflow:auto;border:1px solid #333}
+ #spots div{padding:3px 8px;cursor:pointer}#spots div:hover{background:#333}
+</style></head><body>
+<div>
+ <canvas id="w" width="454" height="454"></canvas>
+ <div class="row" style="justify-content:center;margin-top:18px">
+  <button id="up">▲ UP</button><button id="dn">▼ DOWN</button>
+  <select id="units"><option>kt</option><option>mph</option><option>km/h</option></select>
+ </div>
+ <p>Glance:</p><canvas id="g" width="440" height="110" style="border-radius:12px"></canvas>
+</div>
+<div id="side">
+ <div class="row"><button id="gps">Here (browser GPS)</button>
+  <input id="key" placeholder="UKHO key (optional)" size="28"><span id="src"></span></div>
+ <div id="map"></div>
+ <div id="spots"></div>
+ <pre id="log"></pre>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="tide.js"></script>
+<script>
+// ---------- screens: draw like the watch (454x454 AMOLED, black bg) ----------
+const C = document.getElementById('w').getContext('2d'), G = document.getElementById('g').getContext('2d');
+const W = 454, MID = 227;
+const COL = {fg:'#FFFFFF', dim:'#8A8A8A', wind:'#55DDFF', gust:'#2277AA', wave:'#55FFAA', hi:'#FFCC33', lo:'#4499FF', warn:'#FF5544'};
+let screen = 0, data = null, spot = {name:'Hayling Beachlands', lat:50.7835, lon:-0.976};
+const SCREENS = ['NOW', 'TIDE', 'NEXT 12H', 'WEATHER'];
+
+function txt(ctx, s, x, y, size, col, align='center', bold=true){
+  ctx.fillStyle = col; ctx.font = `${bold?'bold ':''}${size}px system-ui,sans-serif`;
+  ctx.textAlign = align; ctx.textBaseline = 'middle'; ctx.fillText(s, x, y);
+}
+function arrow(ctx, x, y, r, fromDeg, col){ // points where the wind is going
+  const a = (fromDeg + 180) * Math.PI / 180;
+  ctx.save(); ctx.translate(x, y); ctx.rotate(a); ctx.fillStyle = col; ctx.beginPath();
+  ctx.moveTo(0, -r); ctx.lineTo(r*0.6, r*0.7); ctx.lineTo(0, r*0.35); ctx.lineTo(-r*0.6, r*0.7); ctx.closePath(); ctx.fill(); ctx.restore();
+}
+const U = () => document.getElementById('units').value;
+const spd = kt => kt == null ? '--' : Math.round(U()==='kt'?kt:U()==='mph'?kt*1.15078:kt*1.852).toString();
+const hm = t => { const d = new Date(t*1000); return d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/London'}); };
+const short = (s, n) => { s = s.toUpperCase(); if (s.length <= n) return s; const c = s.slice(0, n+1).lastIndexOf(' '); return c > 6 ? s.slice(0, c) : s.slice(0, n); };
+const f1 = v => v == null ? '--' : v.toFixed(1);
+
+function header(title){
+  txt(C, short(spot.name, 18), MID, 40, 20, COL.dim);
+  txt(C, title, MID, 66, 18, COL.dim, 'center', false);
+  // page dots on the right edge
+  const nS = data.inland ? 3 : 4;
+  for (let i=0;i<nS;i++){ C.fillStyle = i===screen?COL.fg:'#444'; C.beginPath(); C.arc(436, MID-24+i*16, 4, 0, 7); C.fill(); }
+}
+function nextTide(){ const now = Date.now()/1000; return data.tide.events.find(e => e.t > now); }
+
+function drawNow(){
+  header('NOW'); const w = data.wind;
+  arrow(C, 140, 175, 56, w.dir, COL.wind);
+  txt(C, spd(w.kt), 300, 160, 96, COL.fg);
+  txt(C, U()+'  '+w.card, 300, 222, 22, COL.wind);
+  txt(C, 'GUST '+spd(w.gust), 140, 262, 26, COL.gust === '#2277AA' ? '#66AADD' : COL.gust);
+  if (!data.inland) txt(C, f1(data.wave.h)+'m '+Math.round(data.wave.p||0)+'s', 316, 262, 26, COL.wave);
+  else txt(C, 'INLAND', 316, 262, 24, COL.dim);
+  C.fillStyle='#333'; C.fillRect(70, 292, 314, 2);
+  const n = nextTide();
+  if (data.inland){
+    const h = data.hours, mx = h.length ? Math.max(...h.map(x=>x.wg||0)) : 0;
+    txt(C, 'MAX GUST '+spd(mx)+' next 12h', MID, 330, 28, mx>=20?COL.warn:COL.fg);
+    txt(C, 'no tide · no waves', MID, 372, 20, COL.dim, 'center', false);
+  } else if (n){
+    txt(C, (n.type==='H'?'HIGH ':'LOW ')+hm(n.t), MID, 330, 40, n.type==='H'?COL.hi:COL.lo);
+    const mins = Math.round((n.t - Date.now()/1000)/60);
+    txt(C, 'in '+Math.floor(mins/60)+'h'+String(mins%60).padStart(2,'0'), MID, 372, 22, COL.dim, 'center', false);
+  }
+  txt(C, data.wx.t!=null?Math.round(data.wx.t)+'°  '+wxName(data.wx.code):'', MID, 404, 20, COL.dim, 'center', false);
+}
+
+function drawTide(){
+  header('TIDE ' + (data.tide.src==='UKHO' ? data.tide.station.toUpperCase().slice(0,12) : '(model)'));
+  const c = data.curve; if (!c.length) return;
+  const x0=50, x1=404, y0=110, y1=230;
+  const vals = c.filter(v=>v!=null), mn=Math.min(...vals), mx=Math.max(...vals);
+  const X = i => x0 + (x1-x0)*i/24, Y = v => y1 - (y1-y0)*(v-mn)/((mx-mn)||1);
+  C.strokeStyle = COL.wave; C.lineWidth = 3; C.beginPath();
+  c.forEach((v,i)=>{ if(v==null) return; i?C.lineTo(X(i),Y(v)):C.moveTo(X(i),Y(v)); }); C.stroke();
+  const now = new Date(), hr = (Date.now()/1000 - data.dayStart)/3600;
+  C.strokeStyle = COL.warn; C.lineWidth = 2; C.beginPath(); C.moveTo(X(hr), y0-6); C.lineTo(X(hr), y1+6); C.stroke();
+  [0,6,12,18,24].forEach(h=>txt(C, String(h%24).padStart(2,'0'), X(h), y1+18, 14, COL.dim,'center',false));
+  const now_s = Date.now()/1000, ev = data.tide.events.filter(e=>e.t>now_s-3*3600).slice(0,4);
+  ev.forEach((e,k)=>{
+    const y = 272 + k*34, past = e.t < now_s;
+    txt(C, e.type==='H'?'HIGH':'LOW', 92, y, 26, past?'#555':(e.type==='H'?COL.hi:COL.lo), 'left');
+    txt(C, hm(e.t), 196, y, 26, past?'#555':COL.fg, 'left');
+    txt(C, (e.h>0&&data.tide.datum==='MSL'?'+':'')+e.h.toFixed(1)+'m', 300, y, 22, past?'#555':COL.dim, 'left', false);
+  });
+}
+
+function drawHours(){
+  header('NEXT 12H'); const hs = data.hours; if (!hs.length) return;
+  const x0=48, bw=(358)/hs.length, base=270;
+  const mx = Math.max(15, ...hs.map(h=>h.wg||0));
+  hs.forEach((h,i)=>{
+    const x = x0 + i*bw, hg = 150*(h.wg||0)/mx, hw = 150*(h.ws||0)/mx;
+    C.fillStyle = '#1d4d6d'; C.fillRect(x+3, base-hg, bw-6, hg);
+    C.fillStyle = COL.wind; C.fillRect(x+3, base-hw, bw-6, hw);
+    if (i%2===0){ txt(C, spd(h.ws), x+bw/2, base-hg-14, 16, COL.fg); }
+    arrow(C, x+bw/2, base+20, 9, h.wd, COL.dim);
+    if (i%3===0) txt(C, String(h.h).padStart(2,'0'), x+bw/2, base+44, 15, COL.dim,'center',false);
+    txt(C, h.wv==null?'':(h.wv>=10?Math.round(h.wv).toString():f1(h.wv)), x+bw/2, base+72, 13, COL.wave,'center',false);
+  });
+  txt(C, 'wind '+U()+' · gust'+(data.inland?'':' · wave m'), MID, 380, 16, COL.dim, 'center', false);
+}
+
+function drawWx(){
+  header('WEATHER'); const x = data.wx;
+  txt(C, x.t==null?'--':Math.round(x.t)+'°', MID, 150, 84, COL.fg);
+  txt(C, wxName(x.code), MID, 210, 26, COL.dim);
+  txt(C, 'H '+Math.round(x.hi)+'°  L '+Math.round(x.lo)+'°', MID, 250, 24, COL.fg, 'center', false);
+  txt(C, 'RAIN '+x.pp+'% next 12h', MID, 286, 22, x.pp>=50?COL.warn:COL.dim, 'center', false);
+  if (!data.inland) txt(C, 'SEA '+f1(x.sea)+'°', MID, 322, 26, COL.wave);
+  txt(C, '↑'+x.rise+'   ↓'+x.set, MID, 360, 24, COL.hi, 'center', false);
+  if (!data.inland) txt(C, 'SWELL '+f1(data.wave.swell_h)+'m '+Math.round(data.wave.swell_p||0)+'s '+data.wave.swell_card, MID, 396, 18, COL.dim, 'center', false);
+}
+
+function drawGlance(){
+  G.fillStyle='#000'; G.fillRect(0,0,440,110);
+  if (!data) return;
+  txt(G, 'TIDELINE · '+short(spot.name, 22), 12, 22, 16, COL.dim, 'left');
+  arrow(G, 30, 66, 18, data.wind.dir, COL.wind);
+  txt(G, spd(data.wind.kt)+' '+data.wind.card, 58, 66, 30, COL.fg, 'left');
+  const n = nextTide();
+  if (data.inland) txt(G, 'GUST '+spd(data.wind.gust), 210, 66, 26, '#66AADD', 'left');
+  else if (n) txt(G, (n.type==='H'?'HI ':'LO ')+hm(n.t), 210, 66, 26, n.type==='H'?COL.hi:COL.lo, 'left');
+  if (!data.inland) txt(G, f1(data.wave.h)+'m', 428, 66, 24, COL.wave, 'right');
+}
+
+function draw(){
+  C.fillStyle='#000'; C.fillRect(0,0,W,W);
+  if (!data){ txt(C,'LOADING…',MID,MID,30,COL.dim); return; }
+  const pages = data.inland ? [drawNow, drawHours, drawWx] : [drawNow, drawTide, drawHours, drawWx];
+  screen = Math.min(screen, pages.length-1);
+  pages[screen]();
+  const age = Math.round((Date.now()/1000 - data.at)/60);
+  txt(C, age<1?'just now':age+'m ago', MID, 432, 14, '#555', 'center', false);
+  drawGlance();
+}
+
+// ---------- UI ----------
+const log = s => document.getElementById('log').textContent = s;
+async function load(s){
+  spot = s; data = null; draw();
+  try {
+    data = await Tideline.fetchConditions(s.lat, s.lon, document.getElementById('key').value.trim());
+    document.getElementById('src').textContent = (data.inland ? 'INLAND' : 'tides: ' + data.tide.src) + (data.marineNudge ? ' · marine nudged '+data.marineNudge : '');
+    log(JSON.stringify(data, null, 1).slice(0, 4000));
+  } catch(e){ log('ERROR '+e); }
+  draw(); mark.setLatLng([s.lat, s.lon]);
+}
+document.getElementById('up').onclick = () => { const n = data&&data.inland?3:4; screen = (screen+n-1)%n; draw(); };
+document.getElementById('dn').onclick = () => { const n = data&&data.inland?3:4; screen = (screen+1)%n; draw(); };
+document.getElementById('units').onchange = draw;
+document.addEventListener('keydown', e => { if(e.key==='ArrowUp') document.getElementById('up').click(); if(e.key==='ArrowDown') document.getElementById('dn').click(); });
+document.getElementById('gps').onclick = () => navigator.geolocation.getCurrentPosition(p => load({name:'Here', lat:p.coords.latitude, lon:p.coords.longitude}), e => log('GPS: '+e.message));
+
+const map = L.map('map').setView([50.78, -0.98], 9);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 17, attribution: '© OpenStreetMap'}).addTo(map);
+const mark = L.circleMarker([50.78,-0.98], {radius: 8, color: '#f54'}).addTo(map);
+map.on('click', e => load({name:'Pin '+e.latlng.lat.toFixed(3)+','+e.latlng.lng.toFixed(3), lat:e.latlng.lat, lon:e.latlng.lng}));
+fetch('spots.json').then(r=>r.json()).then(spots => {
+  spots.forEach(s => L.circleMarker([s.lat,s.lon], {radius:5, color: s.kind==='surf'?'#5df':'#5fa'}).bindTooltip(s.name).on('click', () => load(s)).addTo(map));
+  const box = document.getElementById('spots');
+  spots.forEach(s => { const d = document.createElement('div'); d.textContent = s.name + ' (' + s.kind + ')'; d.onclick = () => { map.setView([s.lat,s.lon], 11); load(s); }; box.appendChild(d); });
+});
+load(spot);
+setInterval(draw, 30000);
+</script>
+</body></html>

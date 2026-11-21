@@ -1,0 +1,12 @@
+<settings>
+    <setting propertyKey="@Properties.units" title="@Strings.UnitsTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.Kt</listEntry>
+            <listEntry value="1">@Strings.Mph</listEntry>
+            <listEntry value="2">@Strings.Kmh</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.ukhoKey" title="@Strings.UkhoTitle">
+        <settingConfig type="alphaNumeric"/>
+    </setting>
+</settings>

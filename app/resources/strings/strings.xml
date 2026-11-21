@@ -1,0 +1,8 @@
+<strings>
+    <string id="AppName">Tideline</string>
+    <string id="UnitsTitle">Wind units</string>
+    <string id="UkhoTitle">UKHO tide key (optional)</string>
+    <string id="Kt">Knots</string>
+    <string id="Mph">mph</string>
+    <string id="Kmh">km/h</string>
+</strings>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<iq:manifest version="3" xmlns:iq="http://www.garmin.com/xml/connectiq">
+    <iq:application id="d4f026e5699c431aafe4abb135b42cb8" type="watch-app" name="@Strings.AppName" entry="TidelineApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="4.2.0">
+        <iq:products>
+            <iq:product id="fenix847mm"/>
+            <iq:product id="fenix843mm"/>
+            <iq:product id="fenix8pro47mm"/>
+            <iq:product id="fenix8solar47mm"/>
+            <iq:product id="fenix8solar51mm"/>
+        </iq:products>
+        <iq:permissions>
+            <iq:uses-permission id="Communications"/>
+            <iq:uses-permission id="Positioning"/>
+        </iq:permissions>
+        <iq:languages><iq:language>eng</iq:language></iq:languages>
+        <iq:barrels/>
+    </iq:application>
+</iq:manifest>
