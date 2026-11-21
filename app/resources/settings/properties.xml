@@ -1,4 +1,4 @@
 <properties>
-    <property id="units" type="number">0</property>
+    <property id="units" type="number">1</property>
     <property id="ukhoKey" type="string"></property>
 </properties>

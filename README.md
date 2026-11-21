@@ -53,7 +53,7 @@ copy the file into `GARMIN/Apps`, unplug.
 
 The `.prg` is built for the **fēnix 8 47mm / 51mm AMOLED**. For other fēnix 8 models, build your own
 (below). A Connect IQ Store listing is on the way. It will add automatic updates and phone settings
-(wind units, UKHO key). A USB-installed copy uses knots.
+(wind units, UKHO key). A USB-installed copy shows wind in mph.
 
 ## Build it yourself
 
