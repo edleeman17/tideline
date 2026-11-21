@@ -8,6 +8,8 @@ Garmin **fēnix 8** watch. UK coast and inland waterways.
 
 *Screenshots from the Connect IQ simulator (fēnix 8 47mm, live data for Hayling Island).*
 
+**➡ [How to install it on your watch](INSTALL.md)**: download one file and drag it onto the watch. About 5 minutes, Windows or Mac.
+
 ## What it shows
 
 | Screen | |
@@ -44,23 +46,14 @@ The watch fetches everything itself through Garmin Connect on your phone:
 
 ## Install
 
-### Option A: Connect IQ Store (easiest, updates itself)
-Search **Tideline** in the Connect IQ app on your phone and tap Install.
-Settings (wind units, UKHO key) are in the same app under *My Device → Tideline → Settings*.
+**Step-by-step guide: [INSTALL.md](INSTALL.md)** (Windows and Mac, no technical knowledge needed).
 
-### Option B: Windows / Mac, by USB cable
-1. Download **`Tideline.prg`** from the [latest release](../../releases/latest).
-2. Plug the watch into the computer with its charging cable.
-3. **Windows:** open *File Explorer*, where the watch shows up as *fēnix 8*. Open
-   *Internal Storage → GARMIN → Apps*.
-   **Mac:** install [OpenMTP](https://openmtp.ganeshrvel.com), then open *GARMIN → Apps*.
-4. Drag `Tideline.prg` into the **Apps** folder.
-5. Unplug the watch. Tideline is in the apps list (press START from the watch face).
-   To add the glance: *Settings → Appearance → Glances → Add*.
+Short version: download `Tideline.prg` from the [latest release](../../releases/latest), plug the watch in,
+copy the file into `GARMIN/Apps`, unplug.
 
-The `.prg` is built for the **fēnix 8 47mm / 51mm AMOLED**. Other fēnix 8
-models: build your own (below) or use the Store. A USB-installed copy uses
-knots and has no phone settings, because Garmin only offers settings for Store installs.
+The `.prg` is built for the **fēnix 8 47mm / 51mm AMOLED**. For other fēnix 8 models, build your own
+(below). A Connect IQ Store listing is on the way. It will add automatic updates and phone settings
+(wind units, UKHO key). A USB-installed copy uses knots.
 
 ## Build it yourself
 
