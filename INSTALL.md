@@ -1,6 +1,9 @@
 # Installing Tideline on your fēnix 8
 
-Takes about 5 minutes. You need the watch, its charging cable and a computer.
+**Easiest way:** open the **Connect IQ** app on your phone, search for **Tideline** and tap Install
+([Store page](https://apps.garmin.com/apps/6e213c6c-8bf1-495e-abd1-91b7030b9f1e)). Updates then arrive automatically. Skip the rest of this page.
+
+**USB install** (no phone app needed): takes about 5 minutes. You need the watch, its charging cable and a computer.
 
 ## Windows
 
@@ -57,7 +60,7 @@ The last data stays on screen, with how old it is shown at the bottom.
 
 ## Updating
 
-Download the new `Tideline.prg` and repeat the steps. Replace the old file when asked.
+Store installs update themselves. For a USB copy, download the new `Tideline.prg` and repeat the steps. Replace the old file when asked.
 
 ## Removing
 

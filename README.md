@@ -8,7 +8,9 @@ Garmin **fēnix 8** watch. UK coast and inland waterways.
 
 *Screenshots from the Connect IQ simulator (fēnix 8 47mm, live data for Hayling Island).*
 
-**➡ [How to install it on your watch](INSTALL.md)**: download one file and drag it onto the watch. About 5 minutes, Windows or Mac.
+**➡ [Get it on the Connect IQ Store](https://apps.garmin.com/apps/6e213c6c-8bf1-495e-abd1-91b7030b9f1e)**: install from the Connect IQ app on your phone. Automatic updates.
+
+No Store? [Install it over USB](INSTALL.md) instead.
 
 ## What it shows
 
@@ -46,14 +48,17 @@ The watch fetches everything itself through Garmin Connect on your phone:
 
 ## Install
 
-**Step-by-step guide: [INSTALL.md](INSTALL.md)** (Windows and Mac, no technical knowledge needed).
+**Easiest: [Connect IQ Store](https://apps.garmin.com/apps/6e213c6c-8bf1-495e-abd1-91b7030b9f1e).** Open the **Connect IQ** app on your phone, search for
+*Tideline*, tap Install. Updates arrive automatically, and you can change wind units
+(mph, knots, km/h) and add a UKHO key in the app's settings.
 
+**Or over USB:** step-by-step guide in [INSTALL.md](INSTALL.md) (Windows and Mac).
 Short version: download `Tideline.prg` from the [latest release](../../releases/latest), plug the watch in,
 copy the file into `GARMIN/Apps`, unplug.
 
 The `.prg` is built for the **fēnix 8 47mm / 51mm AMOLED**. For other fēnix 8 models, build your own
-(below). A Connect IQ Store listing is on the way. It will add automatic updates and phone settings
-(wind units, UKHO key). A USB-installed copy shows wind in mph.
+(below), or use the Store, which covers all fēnix 8 models. A USB-installed copy shows wind in mph
+and has no phone settings.
 
 ## Build it yourself
 
