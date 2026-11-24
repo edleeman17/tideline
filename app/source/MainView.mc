@@ -1,5 +1,5 @@
 // Four pages (three inland): NOW, TIDE, NEXT 12H, WEATHER. Layout matches
-// the browser preview (preview/) pixel for pixel (454x454).
+// the browser preview (preview/) pixel for pixel (454x454 design grid, scaled by SC).
 import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.Math;
@@ -26,6 +26,7 @@ class MainView extends WatchUi.View {
     function onUpdate(dc as Graphics.Dc) as Void {
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
         dc.clear();
+        SC = dc.getWidth() / 454.0;
         if (dc has :setAntiAlias) { dc.setAntiAlias(true); }
         var a = app();
         var d = a.data;
@@ -46,12 +47,12 @@ class MainView extends WatchUi.View {
     }
 
     function header(dc, title as String) as Void {
-        txt(dc, short(app().spot["n"], 18), MID, 40, 20, C_DIM, 0, true);
+        txt(dc, short(app().spot["n"], SC < 0.7 ? 13 : 18), MID, 40, 20, C_DIM, 0, true);
         txt(dc, title, MID, 66, 20, C_DIM, 0, false);
         var n = pages();
         for (var i = 0; i < n; i++) {
             dc.setColor(i == page ? C_FG : 0x444444, Graphics.COLOR_TRANSPARENT);
-            dc.fillCircle(436, MID - 24 + i * 16, 4);
+            dc.fillCircle(sc(436), sc(MID - 24 + i * 16), sc(4) < 2 ? 2 : sc(4));
         }
     }
 
@@ -75,7 +76,7 @@ class MainView extends WatchUi.View {
             txt(dc, f1(d["wave"]["h"]) + "m " + Math.round(d["wave"]["p"] == null ? 0 : d["wave"]["p"]).toNumber() + "s", 316, 262, 26, C_WAVE, 0, true);
         }
         dc.setColor(0x333333, Graphics.COLOR_TRANSPARENT);
-        dc.fillRectangle(70, 292, 314, 2);
+        dc.fillRectangle(sc(70), sc(292), sc(314), sc(2) < 1 ? 1 : sc(2));
         var n = nextTide(d);
         if (d["inl"] || d["tide"]["src"].equals("none")) {
             var mx = 0.0;
@@ -102,20 +103,20 @@ class MainView extends WatchUi.View {
             for (var i = 0; i < c.size(); i++) { if (c[i] != null) { if (c[i] < mn) { mn = c[i]; } if (c[i] > mx) { mx = c[i]; } } }
             var rng = mx - mn > 0 ? mx - mn : 1.0;
             dc.setColor(C_WAVE, Graphics.COLOR_TRANSPARENT);
-            dc.setPenWidth(3);
+            pen(dc, 3);
             var px = null, py = null;
             for (var i = 0; i < c.size(); i++) {
                 if (c[i] == null) { px = null; continue; }
                 var X = x0 + (x1 - x0) * i / 24.0, Y = y1 - (y1 - y0) * (c[i] - mn) / rng;
-                if (px != null) { dc.drawLine(px, py, X, Y); }
+                if (px != null) { dc.drawLine(sc(px), sc(py), sc(X), sc(Y)); }
                 px = X; py = Y;
             }
             var hr = (Time.now().value() - d["day0"]) / 3600.0;
             if (hr >= 0 && hr <= 24) {
                 var X = x0 + (x1 - x0) * hr / 24.0;
                 dc.setColor(C_WARN, Graphics.COLOR_TRANSPARENT);
-                dc.setPenWidth(2);
-                dc.drawLine(X, y0 - 6, X, y1 + 6);
+                pen(dc, 2);
+                dc.drawLine(sc(X), sc(y0 - 6), sc(X), sc(y1 + 6));
             }
             dc.setPenWidth(1);
             for (var h = 0; h <= 24; h += 6) { txt(dc, (h % 24).format("%02d"), x0 + (x1 - x0) * h / 24, y1 + 18, 16, C_DIM, 0, false); }
@@ -149,17 +150,17 @@ class MainView extends WatchUi.View {
             var x = x0 + i * bw;
             var hg = 150 * (h["wg"] == null ? 0 : h["wg"]) / mx, hw = 150 * (h["ws"] == null ? 0 : h["ws"]) / mx;
             dc.setColor(C_GUSTBAR, Graphics.COLOR_TRANSPARENT);
-            dc.fillRectangle(x + 3, base - hg, bw - 6, hg);
+            dc.fillRectangle(sc(x + 3), sc(base - hg), sc(bw - 6), sc(hg));
             dc.setColor(C_WIND, Graphics.COLOR_TRANSPARENT);
-            dc.fillRectangle(x + 3, base - hw, bw - 6, hw);
+            dc.fillRectangle(sc(x + 3), sc(base - hw), sc(bw - 6), sc(hw));
             if (i % 2 == 0) { txt(dc, spd(h["ws"]), x + bw / 2, base - hg - 14, 18, C_FG, 0, true); }
             arrow(dc, x + bw / 2, base + 20, 9, h["wd"], C_DIM);
             if (i % 3 == 0) { txt(dc, h["h"].format("%02d"), x + bw / 2, base + 44, 17, C_DIM, 0, false); }
-            if (h["wv"] != null) {
+            if (h["wv"] != null && (SC >= 0.8 || i % 2 == 0)) {
                 txt(dc, h["wv"] >= 10 ? Math.round(h["wv"]).toNumber().toString() : f1(h["wv"]), x + bw / 2, base + 72, 16, C_WAVE, 0, false);
             }
         }
-        txt(dc, "wind " + unitName() + " · gust" + (d["inl"] ? "" : " · wave m"), MID, 380, 18, C_DIM, 0, false);
+        txt(dc, (SC < 0.8 ? "" : "wind ") + unitName() + " · gust" + (d["inl"] ? "" : " · wave m"), MID, 380, 18, C_DIM, 0, false);
     }
 
     function drawWx(dc, d) as Void {

@@ -10,6 +10,8 @@ class TideGlance extends WatchUi.GlanceView {
     function initialize() { GlanceView.initialize(); }
 
     function onUpdate(dc as Graphics.Dc) as Void {
+        SC = 1.0;
+        inGlance = true;
         var g = Application.Storage.getValue("glance");
         var w = dc.getWidth(), h = dc.getHeight();
         if (g == null) {

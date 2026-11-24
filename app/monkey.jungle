@@ -1,1 +1,32 @@
 project.manifest = manifest.xml
+
+# Watches with maps get the map picker; the rest exclude it.
+base.excludeAnnotations = nomaps
+approachs50.excludeAnnotations = maps
+approachs7042mm.excludeAnnotations = maps
+approachs7047mm.excludeAnnotations = maps
+descentg2.excludeAnnotations = maps
+fr165.excludeAnnotations = maps
+fr165m.excludeAnnotations = maps
+fr170.excludeAnnotations = maps
+fr170m.excludeAnnotations = maps
+fr255.excludeAnnotations = maps
+fr255m.excludeAnnotations = maps
+fr255s.excludeAnnotations = maps
+fr255sm.excludeAnnotations = maps
+fr265.excludeAnnotations = maps
+fr265s.excludeAnnotations = maps
+fr57042mm.excludeAnnotations = maps
+fr57047mm.excludeAnnotations = maps
+fr70.excludeAnnotations = maps
+instinct3amoled45mm.excludeAnnotations = maps
+instinct3amoled50mm.excludeAnnotations = maps
+venu2.excludeAnnotations = maps
+venu2plus.excludeAnnotations = maps
+venu2s.excludeAnnotations = maps
+venu3.excludeAnnotations = maps
+venu3s.excludeAnnotations = maps
+venu441mm.excludeAnnotations = maps
+venu445mm.excludeAnnotations = maps
+vivoactive5.excludeAnnotations = maps
+vivoactive6.excludeAnnotations = maps

@@ -1,4 +1,4 @@
-# Installing Tideline on your fēnix 8
+# Installing Tideline on your watch
 
 **Easiest way:** open the **Connect IQ** app on your phone, search for **Tideline** and tap Install
 ([Store page](https://apps.garmin.com/apps/6e213c6c-8bf1-495e-abd1-91b7030b9f1e)). Updates then arrive automatically. Skip the rest of this page.

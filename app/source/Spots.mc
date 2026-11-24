@@ -4,6 +4,7 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.Math;
 import Toybox.Position;
+import Toybox.System;
 import Toybox.WatchUi;
 
 function openSpotsMenu() as Void {
@@ -12,7 +13,7 @@ function openSpotsMenu() as Void {
     m.addItem(new WatchUi.MenuItem("Here (GPS)", "use my position", :gps, null));
     m.addItem(new WatchUi.MenuItem("Nearby spots", "UK surf + SUP", :near, null));
     m.addItem(new WatchUi.MenuItem("Favourites", a.favs().size() + " saved", :favs, null));
-    m.addItem(new WatchUi.MenuItem("Pick on map", "move target, START", :map, null));
+    addMapItem(m);
     if (a.spot != null) {
         m.addItem(new WatchUi.MenuItem(a.isFav() ? "Remove favourite" : "Save as favourite", short(a.spot["n"], 18), :fav, null));
         m.addItem(new WatchUi.MenuItem(a.noTide() ? "Tide: OFF here" : "Tide: auto", "off for canals by the sea", :notide, null));
@@ -20,6 +21,23 @@ function openSpotsMenu() as Void {
     }
     WatchUi.pushView(m, new SpotsDelegate(), WatchUi.SLIDE_UP);
 }
+
+// Map picker only on watches with maps (monkey.jungle excludes :maps elsewhere).
+(:maps)
+function addMapItem(m as WatchUi.Menu2) as Void {
+    m.addItem(new WatchUi.MenuItem("Pick on map", "move target, START", :map, null));
+}
+(:maps)
+function openMap() as Void {
+    var a = app();
+    var c = a.spot != null ? [a.spot["la"], a.spot["lo"]] : [50.78, -0.98];
+    var v = new MapPick(c[0], c[1]);
+    WatchUi.pushView(v, new MapPickDelegate(v), WatchUi.SLIDE_LEFT);
+}
+(:nomaps)
+function addMapItem(m as WatchUi.Menu2) as Void {}
+(:nomaps)
+function openMap() as Void {}
 
 function km(la1, lo1, la2, lo2) as Float {
     var p = Math.PI / 180;
@@ -36,11 +54,7 @@ class SpotsDelegate extends WatchUi.Menu2InputDelegate {
         if (id == :gps) { WatchUi.popView(WatchUi.SLIDE_DOWN); a.useGps(); }
         else if (id == :near) { nearbyMenu(); }
         else if (id == :favs) { favsMenu(); }
-        else if (id == :map) {
-            var c = a.spot != null ? [a.spot["la"], a.spot["lo"]] : [50.78, -0.98];
-            var v = new MapPick(c[0], c[1]);
-            WatchUi.pushView(v, new MapPickDelegate(v), WatchUi.SLIDE_LEFT);
-        }
+        else if (id == :map) { openMap(); }
         else if (id == :fav) { a.toggleFav(); WatchUi.popView(WatchUi.SLIDE_DOWN); }
         else if (id == :notide) { WatchUi.popView(WatchUi.SLIDE_DOWN); a.toggleNoTide(); }
         else if (id == :refresh) { WatchUi.popView(WatchUi.SLIDE_DOWN); a.refresh(); }
@@ -87,6 +101,7 @@ class PickDelegate extends WatchUi.Menu2InputDelegate {
 
 // Map picker. MapView can't report where the user browsed to, so the app
 // owns the visible area: drag or UP/DOWN to move/zoom, START picks the centre.
+(:maps)
 class MapPick extends WatchUi.MapView {
     var la as Float, lo as Float;
     var span as Float = 0.2; // degrees of latitude shown
@@ -100,7 +115,8 @@ class MapPick extends WatchUi.MapView {
         MapView.initialize();
         la = lat; lo = lon;
         setMapMode(WatchUi.MAP_MODE_PREVIEW);
-        setScreenVisibleArea(0, 0, 454, 454);
+        var sw = System.getDeviceSettings().screenWidth;
+        setScreenVisibleArea(0, 0, sw, sw);
         var all = WatchUi.loadResource(Rez.JsonData.Spots) as Array;
         var mk = [];
         for (var i = 0; i < all.size(); i++) {
@@ -137,24 +153,26 @@ class MapPick extends WatchUi.MapView {
 
     function onUpdate(dc as Graphics.Dc) as Void {
         MapView.onUpdate(dc);
+        SC = dc.getWidth() / 454.0;
         // crosshair: black outline under white so it shows on any map colour
         for (var k = 0; k < 2; k++) {
             dc.setColor(k == 0 ? Graphics.COLOR_BLACK : Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.setPenWidth(k == 0 ? 8 : 4);
-            dc.drawLine(227, 187, 227, 213); dc.drawLine(227, 241, 227, 267);
-            dc.drawLine(187, 227, 213, 227); dc.drawLine(241, 227, 267, 227);
-            dc.drawCircle(227, 227, 6);
+            pen(dc, k == 0 ? 8 : 4);
+            dc.drawLine(sc(227), sc(187), sc(227), sc(213)); dc.drawLine(sc(227), sc(241), sc(227), sc(267));
+            dc.drawLine(sc(187), sc(227), sc(213), sc(227)); dc.drawLine(sc(241), sc(227), sc(267), sc(227));
+            dc.drawCircle(sc(227), sc(227), sc(6));
         }
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
-        dc.fillRoundedRectangle(97, 370, 260, 62, 10);
+        dc.fillRoundedRectangle(sc(97), sc(370), sc(260), sc(62), sc(10));
         txt(dc, MODES[mode], 227, 386, 18, C_FG, 0, true);
         txt(dc, "hold UP: mode · START: pick", 227, 412, 16, C_DIM, 0, false);
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_TRANSPARENT);
-        dc.fillRoundedRectangle(147, 26, 160, 30, 8);
+        dc.fillRoundedRectangle(sc(147), sc(26), sc(160), sc(30), sc(8));
         txt(dc, la.format("%.3f") + ", " + lo.format("%.3f"), 227, 41, 18, C_FG, 0, true);
     }
 }
 
+(:maps)
 class MapPickDelegate extends WatchUi.BehaviorDelegate {
     var v as MapPick;
     var sx = null, sy = null;
@@ -176,7 +194,7 @@ class MapPickDelegate extends WatchUi.BehaviorDelegate {
     function onDrag(e as WatchUi.DragEvent) as Boolean {
         var c = e.getCoordinates();
         if (e.getType() == WatchUi.DRAG_TYPE_START) { sx = c[0]; sy = c[1]; }
-        else if (e.getType() == WatchUi.DRAG_TYPE_STOP && sx != null) { v.pan(c[0] - sx, c[1] - sy); sx = null; }
+        else if (e.getType() == WatchUi.DRAG_TYPE_STOP && sx != null) { v.pan(((c[0] - sx) / SC).toNumber(), ((c[1] - sy) / SC).toNumber()); sx = null; }
         return true;
     }
     // Swipes are coarse pans on screens without drag events.

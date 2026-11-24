@@ -1,7 +1,8 @@
 # Tideline
 
 Wind, tides, waves and weather for surfing, paddleboarding and canals, on a
-Garmin **fēnix 8** watch. UK coast and inland waterways.
+Garmin watch: **fēnix 7/8/9, epix, Forerunner 165–970, Venu 2–4, vívoactive 5/6, Enduro, MARQ** and more
+(68 models). UK coast and inland waterways.
 
 ![Now, Tide, Next 12 hours, Weather](docs/row1.png)
 ![Pick on map, Inland (canal) mode, Spots menu](docs/row2.png)
@@ -56,8 +57,9 @@ The watch fetches everything itself through Garmin Connect on your phone:
 Short version: download `Tideline.prg` from the [latest release](../../releases/latest), plug the watch in,
 copy the file into `GARMIN/Apps`, unplug.
 
-The `.prg` is built for the **fēnix 8 47mm / 51mm AMOLED**. For other fēnix 8 models, build your own
-(below), or use the Store, which covers all fēnix 8 models. A USB-installed copy shows wind in mph
+The `.prg` is built for the **fēnix 8 47mm / 51mm AMOLED**. For any other watch, use the Store
+(it picks the right build for your watch), or build your own (below). *Pick on map* only
+appears on watches that have maps. A USB-installed copy shows wind in mph
 and has no phone settings.
 
 ## Build it yourself

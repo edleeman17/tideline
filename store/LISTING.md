@@ -33,10 +33,10 @@ Not for navigation. Always check official sources before going out.
 
 Open source (MIT): https://github.com/edleeman17/tideline
 
-## What's new (1.0.1)
-Wind now shows in mph by default (change to knots or km/h in the app settings).
+## What's new (1.1.0)
+Now on 68 Garmin watches: fēnix 7/8/9, epix, Forerunner, Venu, vívoactive, Enduro, MARQ and more. Screens scale to your watch. Map picking on watches with maps.
 
 ## Files
-- App package: https://github.com/edleeman17/tideline/releases/download/v1.0.1/Tideline.iq
+- App package: https://github.com/edleeman17/tideline/releases/download/v1.1.0/Tideline.iq
 - Store icon: icon-500.png (this folder)
 - Screenshots: ../docs/screens/ (1-now to 5-map-pick)

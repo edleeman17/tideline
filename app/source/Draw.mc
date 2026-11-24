@@ -18,8 +18,24 @@ const C_PAST = 0x555555;
 (:glance)
 var fontCache as Dictionary = {};
 
+// Layouts are drawn on a 454x454 design grid; SC scales them to the real
+// screen (set per onUpdate). The glance draws in real pixels (SC = 1).
 (:glance)
-function font(size as Number, bold as Boolean) {
+var SC as Float = 1.0;
+
+(:glance)
+function sc(v) { return v * SC; }
+
+(:glance)
+function pen(dc as Graphics.Dc, w as Number) as Void {
+    var p = (w * SC + 0.5).toNumber();
+    dc.setPenWidth(p < 1 ? 1 : p);
+}
+
+// Vector Roboto where the watch has it; otherwise the largest system font
+// that fits the requested pixel height (some watches lack the Roboto faces).
+(:glance)
+function font(dc as Graphics.Dc, size as Number, bold as Boolean) {
     var k = size * 2 + (bold ? 1 : 0);
     var f = fontCache[k];
     if (f == null) {
@@ -27,27 +43,71 @@ function font(size as Number, bold as Boolean) {
             f = Graphics.getVectorFont({:face => bold ? ["RobotoCondensedBold", "RobotoBold", "RobotoRegular"]
                                                       : ["RobotoCondensedRegular", "RobotoRegular"], :size => size});
         }
-        if (f == null) {
-            f = size >= 80 ? Graphics.FONT_NUMBER_HOT : size >= 36 ? Graphics.FONT_LARGE : size >= 24 ? Graphics.FONT_MEDIUM
-              : size >= 18 ? Graphics.FONT_SMALL : Graphics.FONT_XTINY;
-        }
+        if (f == null) { f = sysFont(dc, size); }
         fontCache[k] = f;
     }
     return f;
 }
 
+(:glance)
+function digits(s as String) as Boolean {
+    var a = s.toCharArray();
+    for (var i = 0; i < a.size(); i++) { if (a[i] < '0' || a[i] > '9') { return false; } }
+    return a.size() > 0;
+}
+
+(:glance)
+function numFont(dc as Graphics.Dc, size as Number) {
+    var fs = [Graphics.FONT_NUMBER_MILD, Graphics.FONT_NUMBER_MEDIUM, Graphics.FONT_NUMBER_HOT];
+    var best = Graphics.FONT_LARGE;
+    for (var i = 0; i < fs.size(); i++) {
+        if (dc.getFontHeight(fs[i]) <= size * 1.15) { best = fs[i]; }
+    }
+    return best;
+}
+
+// Glances only accept the glance fonts.
+(:glance)
+var inGlance as Boolean = false;
+
+(:glance)
+function sysFont(dc as Graphics.Dc, size as Number) {
+    if (inGlance) { return Graphics has :FONT_GLANCE ? Graphics.FONT_GLANCE : Graphics.FONT_XTINY; }
+    var fs = [Graphics.FONT_XTINY, Graphics.FONT_TINY, Graphics.FONT_SMALL, Graphics.FONT_MEDIUM, Graphics.FONT_LARGE];
+    var best = fs[0];
+    for (var i = 1; i < fs.size(); i++) {
+        if (dc.getFontHeight(fs[i]) <= size * 1.15) { best = fs[i]; }
+    }
+    return best;
+}
+
 // align: -1 left, 0 centre, 1 right; y is the vertical centre.
 (:glance)
 function txt(dc as Graphics.Dc, s as String, x, y, size as Number, col as Number, align as Number, bold as Boolean) as Void {
+    if (SC != 1.0) {
+        x = x * SC; y = y * SC;
+        // text shrinks less than the layout so small screens stay readable
+        size = (size * (SC < 1.0 ? Math.pow(SC, 0.7) : SC) + 0.5).toNumber();
+        if (size < 11) { size = 11; }
+    }
     var j = align < 0 ? Graphics.TEXT_JUSTIFY_LEFT : align > 0 ? Graphics.TEXT_JUSTIFY_RIGHT : Graphics.TEXT_JUSTIFY_CENTER;
     dc.setColor(col, Graphics.COLOR_TRANSPARENT);
-    dc.drawText(x, y, font(size, bold), s, j | Graphics.TEXT_JUSTIFY_VCENTER);
+    var f = font(dc, size, bold);
+    if (size >= 40 && (f instanceof Number) && digits(s)) { f = numFont(dc, size); }
+    try {
+        dc.drawText(x, y, f, s, j | Graphics.TEXT_JUSTIFY_VCENTER);
+    } catch (e) {
+        f = sysFont(dc, size);
+        fontCache[size * 2 + (bold ? 1 : 0)] = f;
+        dc.drawText(x, y, f, s, j | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
 }
 
 // Arrow pointing where the wind is GOING (fromDeg + 180).
 (:glance)
 function arrow(dc as Graphics.Dc, x, y, r, fromDeg, col as Number) as Void {
     if (fromDeg == null) { return; }
+    x = x * SC; y = y * SC; r = r * SC;
     var a = (fromDeg + 180) * Math.PI / 180.0;
     var s = Math.sin(a), c = Math.cos(a);
     var pts = [[0, -r], [r * 0.6, r * 0.7], [0, r * 0.35], [-r * 0.6, r * 0.7]];
